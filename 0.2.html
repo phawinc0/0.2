@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ไปไหนดี — คู่มือปลายทางเที่ยวไทย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Anuphan:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- พื้นฐาน ---------- */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --paper:#F2ECDF; --paper-2:#E9E0CB; --ink:#1C1712; --ink-2:#6E6355;
+  --accent:#C2451D; --line:#1C1712;
+  --fd:'Chonburi',serif; --fb:'Anuphan',sans-serif;
+  --ease:cubic-bezier(.77,0,.18,1);
+}
+body{background:var(--paper);color:var(--ink);font-family:var(--fb);font-weight:400;overflow-x:hidden}
+body.lock{overflow:hidden}
+::selection{background:var(--accent);color:var(--paper)}
+img{display:block;max-width:100%}
+button{font-family:var(--fb);background:none;border:0;cursor:pointer;color:inherit}
+a{color:inherit;text-decoration:none}
+/* เกรนกระดาษบาง ๆ ทั่วหน้า */
+body::after{content:"";position:fixed;inset:0;z-index:3000;pointer-events:none;mix-blend-mode:multiply;opacity:.55;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ---------- ตัวโหลด ---------- */
+#loader{position:fixed;inset:0;z-index:2000;background:var(--ink);color:var(--paper);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:22px;transition:transform .9s var(--ease)}
+#loader.done{transform:translateY(-101%)}
+#loader .l-mark{font-family:var(--fd);font-size:clamp(2.4rem,7vw,4.4rem)}
+#loader .l-bar{width:min(320px,60vw);height:2px;background:rgba(242,236,223,.2)}
+#loader .l-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s linear}
+#loader .l-num{font-variant-numeric:tabular-nums;letter-spacing:.3em;font-size:.8rem;color:rgba(242,236,223,.7)}
+
+/* ---------- แถบเมนู ---------- */
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 4.5vw;transition:background .35s,border-color .35s;border-bottom:1px solid transparent}
+#nav.scrolled{background:var(--paper);border-bottom-color:var(--line)}
+.brand{font-family:var(--fd);font-size:1.35rem;line-height:1}
+.brand span{color:var(--accent);font-size:.8em;vertical-align:super}
+#nav .links{display:flex;gap:34px}
+#nav .links a{font-size:.92rem;font-weight:500;position:relative;padding:4px 0}
+#nav .links a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--accent);transition:width .3s}
+#nav .links a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:18px}
+.clock{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--ink-2);letter-spacing:.04em}
+.save-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);border-radius:999px;padding:9px 16px;font-size:.88rem;font-weight:600;transition:.25s}
+.save-btn b{font-variant-numeric:tabular-nums;background:var(--paper-2);border-radius:999px;min-width:22px;text-align:center;padding:1px 5px;transition:.25s}
+.save-btn.has b{background:var(--accent);color:var(--paper)}
+.save-btn:hover{background:var(--ink);color:var(--paper)}
+.burger{display:none;width:42px;height:42px;border:1px solid var(--ink);border-radius:999px;align-items:center;justify-content:center}
+.burger svg{width:18px;height:18px}
+
+/* แผงรายการที่บันทึกไว้ */
+.save-pop{position:fixed;top:66px;right:4.5vw;z-index:120;width:min(340px,88vw);background:var(--paper);border:1px solid var(--ink);box-shadow:6px 6px 0 var(--ink);opacity:0;transform:translateY(-8px);pointer-events:none;transition:.3s var(--ease)}
+.save-pop.open{opacity:1;transform:none;pointer-events:auto}
+.save-pop .sp-head{padding:12px 16px;border-bottom:1px solid var(--ink);font-size:.78rem;letter-spacing:.14em;color:var(--ink-2)}
+.save-pop .sp-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(28,23,18,.15);cursor:pointer}
+.save-pop .sp-item:hover{background:var(--paper-2)}
+.save-pop .sp-item .n{font-family:var(--fd);font-size:1rem}
+.save-pop .sp-item .p{font-size:.78rem;color:var(--ink-2)}
+.save-pop .sp-x{width:28px;height:28px;border:1px solid var(--ink);border-radius:999px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.save-pop .sp-x:hover{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.save-pop .sp-empty{padding:22px 16px;font-size:.9rem;color:var(--ink-2)}
+.save-pop .sp-x svg{width:12px;height:12px}
+
+/* ---------- ฮีโร่ ---------- */
+.hero{min-height:100svh;position:relative;padding:110px 4.5vw 42px;display:flex;flex-direction:column;justify-content:space-between}
+.hero-top{display:flex;justify-content:space-between;gap:16px;padding-bottom:14px;border-bottom:1px solid var(--line);font-size:.82rem;letter-spacing:.12em;color:var(--ink-2)}
+.hero-title{font-family:var(--fd);font-weight:400;font-size:clamp(3.4rem,13.5vw,11rem);line-height:1.02;margin-top:4vh;position:relative;z-index:2}
+.hero-title .line{display:block;overflow:hidden}
+.hero-title .inner{display:block;transform:translateY(112%);transition:transform 1.1s var(--ease)}
+body.ready .hero-title .inner{transform:none}
+.hero-title .line.l2{text-align:right;padding-right:7vw}
+.hero-title .q{color:var(--accent)}
+.h-img{display:inline-block;width:1.55em;height:.72em;border-radius:.09em;overflow:hidden;vertical-align:baseline;transform:translateY(.09em);margin:0 .04em;background:var(--paper-2);clip-path:inset(0 0 101% 0);transition:clip-path 1.1s var(--ease) .35s}
+body.ready .h-img{clip-path:inset(0 0 0% 0)}
+.h-img img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s ease .2s}
+.hero-img-main{position:absolute;right:5.5vw;top:17%;width:clamp(200px,25vw,400px);aspect-ratio:4/5;object-fit:cover;z-index:1;border:1px solid var(--ink);background:var(--paper-2);clip-path:inset(101% 0 0 0);transition:clip-path 1.2s var(--ease) .5s,opacity .9s ease .7s}
+body.ready .hero-img-main{clip-path:inset(0 0 0 0)}
+.badge{position:absolute;right:8vw;top:12.5%;z-index:3;width:132px;height:132px;display:grid;place-items:center;opacity:0;transition:opacity .8s .9s}
+body.ready .badge{opacity:1}
+.badge-ring{position:absolute;inset:0;animation:spin 16s linear infinite}
+.badge-ring text{font-family:var(--fb);font-weight:600;font-size:12.5px;letter-spacing:2px;fill:var(--ink)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.badge-arrow{width:30px;height:30px;color:var(--accent)}
+.hero-foot{border-top:1px solid var(--line);padding-top:26px;display:grid;grid-template-columns:1.2fr auto auto;gap:40px;align-items:end}
+.lede{max-width:44ch;font-size:1.02rem;line-height:1.75;color:var(--ink-2)}
+.cta{display:inline-flex;align-items:center;gap:12px;background:var(--ink);color:var(--paper);border-radius:999px;padding:16px 26px;font-weight:600;font-size:.95rem;transition:background .3s}
+.cta svg{width:17px;height:17px;transition:transform .3s}
+.cta:hover{background:var(--accent)}
+.cta:hover svg{transform:translate(3px,-3px)}
+.stats{display:flex;gap:34px}
+.stat b{display:block;font-family:var(--fd);font-weight:400;font-size:2.2rem;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.78rem;letter-spacing:.1em;color:var(--ink-2)}
+
+/* ---------- แถบวิ่ง ---------- */
+.ticker{background:var(--ink);color:var(--paper);overflow:hidden;padding:13px 0;border-top:1px solid var(--ink)}
+.ticker-track{display:flex;width:max-content;animation:tick 32s linear infinite}
+.ticker-g{display:flex;align-items:center;gap:34px;padding-right:34px;font-family:var(--fd);font-size:1.05rem;white-space:nowrap}
+.ticker-g svg{width:13px;height:13px;color:var(--accent)}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* ---------- หัวส่วน ---------- */
+.section{padding:88px 4.5vw 96px}
+.sec-head{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:end;border-top:1px solid var(--line);padding-top:24px;margin-bottom:36px}
+.sec-no{font-family:var(--fd);font-size:1rem;color:var(--accent);border:1px solid var(--line);border-radius:999px;width:46px;height:46px;display:grid;place-items:center}
+.sec-kick{font-size:.78rem;letter-spacing:.16em;color:var(--ink-2);margin-bottom:8px}
+.sec-head h2{font-family:var(--fd);font-weight:400;font-size:clamp(1.9rem,4.4vw,3.2rem);line-height:1.1}
+.sec-note{max-width:26ch;font-size:.86rem;line-height:1.7;color:var(--ink-2);text-align:right}
+
+/* ---------- ตัวกรอง ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.fbtn{border:1px solid var(--ink);border-radius:999px;padding:9px 18px;font-size:.9rem;font-weight:500;transition:.25s}
+.fbtn i{font-style:normal;font-variant-numeric:tabular-nums;font-size:.78rem;color:var(--accent);margin-left:7px}
+.fbtn:hover{background:var(--paper-2)}
+.fbtn.active{background:var(--ink);color:var(--paper)}
+.fbtn.active i{color:var(--paper-2)}
+
+/* ---------- ดัชนีปลายทาง ---------- */
+.dlist{margin-top:26px}
+.drow{display:grid;grid-template-columns:3.4rem 1fr auto auto;gap:26px;align-items:center;border-top:1px solid var(--line);padding:24px 10px;cursor:pointer;transition:background .3s;animation:rowin .6s var(--ease) both}
+.drow:last-child{border-bottom:1px solid var(--line)}
+@keyframes rowin{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.drow:hover{background:var(--paper-2)}
+.d-no{font-family:var(--fd);color:var(--ink-2);font-size:.95rem;transition:color .3s}
+.drow:hover .d-no{color:var(--accent)}
+.d-name{font-family:var(--fd);font-weight:400;font-size:clamp(1.45rem,3vw,2.35rem);line-height:1.15;transition:transform .35s var(--ease)}
+.drow:hover .d-name{transform:translateX(14px)}
+.d-prov{display:block;font-family:var(--fb);font-size:.85rem;color:var(--ink-2);margin-top:5px;letter-spacing:.05em}
+.d-meta{display:flex;align-items:center;gap:22px}
+.d-cat{border:1px solid var(--ink);border-radius:999px;padding:6px 14px;font-size:.8rem;font-weight:500;white-space:nowrap}
+.d-sub{font-size:.82rem;color:var(--ink-2);white-space:nowrap}
+.d-act{display:flex;gap:10px}
+.bm,.go{width:44px;height:44px;border-radius:999px;display:grid;place-items:center;transition:.25s}
+.bm{border:1px solid var(--ink)}
+.bm svg{width:17px;height:17px}
+.bm:hover{background:var(--ink);color:var(--paper)}
+.bm.on{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.bm.on svg path{fill:currentColor}
+.go{background:var(--ink);color:var(--paper)}
+.go svg{width:16px;height:16px;transition:transform .3s}
+.drow:hover .go{background:var(--accent)}
+.drow:hover .go svg{transform:translate(2px,-2px)}
+
+/* ภาพลอยตามเมาส์ */
+.peek{position:fixed;top:0;left:0;z-index:80;width:270px;pointer-events:none;will-change:transform}
+.peek-in{opacity:0;transform:scale(.85);transition:opacity .3s,transform .35s var(--ease)}
+.peek.show .peek-in{opacity:1;transform:scale(1)}
+.peek-in .ph{position:relative;aspect-ratio:4/3;border:1px solid var(--ink);background:var(--paper-2);box-shadow:8px 8px 0 rgba(28,23,18,.9);overflow:hidden}
+.peek-in img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease}
+.peek-tag{position:absolute;left:10px;bottom:10px;background:var(--ink);color:var(--paper);font-size:.74rem;padding:5px 11px;letter-spacing:.08em;z-index:1}
+
+/* ---------- เส้นทาง 72 ชม. ---------- */
+.route-grid{display:grid;grid-template-columns:.9fr 1.4fr;gap:60px;align-items:start}
+.route-side{position:sticky;top:110px}
+.route-side p{font-size:1rem;line-height:1.85;color:var(--ink-2);margin:16px 0 26px;max-width:38ch}
+.btn-ghost{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--ink);border-radius:999px;padding:14px 24px;font-weight:600;font-size:.92rem;transition:.25s}
+.btn-ghost svg{width:15px;height:15px}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+.day{border-top:1px solid var(--line);padding:30px 0 40px}
+.day:last-child{border-bottom:1px solid var(--line)}
+.day-head{display:flex;align-items:baseline;gap:20px;margin-bottom:24px}
+.day-no{font-size:.8rem;letter-spacing:.14em;color:var(--accent);font-weight:700;white-space:nowrap}
+.day-head h3{font-family:var(--fd);font-weight:400;font-size:clamp(1.3rem,2.6vw,1.9rem)}
+.stops{list-style:none}
+.stops li{display:grid;grid-template-columns:74px 14px 1fr;gap:16px;position:relative;padding-bottom:26px}
+.stops li:last-child{padding-bottom:0}
+.stops .t{font-variant-numeric:tabular-nums;font-size:.86rem;font-weight:600;color:var(--ink-2);padding-top:2px}
+.stops .dot{width:11px;height:11px;border:2px solid var(--ink);border-radius:999px;background:var(--paper);margin-top:5px;position:relative;z-index:1}
+.stops li:not(:last-child) .dot::after{content:"";position:absolute;left:4px;top:14px;width:1px;height:calc(100% + 16px);background:var(--line)}
+.stops strong{display:block;font-size:1rem;font-weight:600;margin-bottom:4px}
+.stops p{font-size:.9rem;line-height:1.7;color:var(--ink-2)}
+
+/* ---------- จดหมายจากทาง ---------- */
+.quote-sec{background:var(--ink);color:var(--paper);padding:110px 4.5vw}
+.quote-sec .k{font-size:.8rem;letter-spacing:.18em;color:rgba(242,236,223,.55)}
+.quote-sec blockquote{font-family:var(--fd);font-weight:400;font-size:clamp(1.7rem,4.6vw,3.4rem);line-height:1.4;margin:28px 0 34px;max-width:22em}
+.quote-sec blockquote em{font-style:normal;color:var(--accent)}
+.quote-sec .c{font-size:.9rem;color:rgba(242,236,223,.6)}
+
+/* ---------- ท้ายหน้า ---------- */
+footer{border-top:1px solid var(--line);padding:70px 4.5vw 30px}
+.f-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:70px}
+.f-top p{font-size:.9rem;line-height:1.8;color:var(--ink-2);max-width:34ch;margin-top:14px}
+.f-col h5{font-size:.78rem;letter-spacing:.16em;color:var(--ink-2);margin-bottom:16px;font-weight:600}
+.f-col a,.f-col button{display:block;font-size:.95rem;padding:5px 0;text-align:left}
+.f-col a:hover,.f-col button:hover{color:var(--accent)}
+.f-big{font-family:var(--fd);font-size:clamp(4rem,13vw,11rem);line-height:1;text-align:center;color:transparent;-webkit-text-stroke:1.5px var(--ink);user-select:none;transition:color .5s}
+.f-big:hover{color:var(--accent);-webkit-text-stroke-color:var(--accent)}
+.f-bot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:34px;padding-top:20px;font-size:.82rem;color:var(--ink-2)}
+
+/* ---------- แผงรายละเอียด ---------- */
+.drawer{position:fixed;inset:0;z-index:900;visibility:hidden}
+.drawer.open{visibility:visible}
+.scrim{position:absolute;inset:0;background:rgba(28,23,18,.45);opacity:0;transition:opacity .5s}
+.drawer.open .scrim{opacity:1}
+.panel{position:absolute;top:0;right:0;height:100%;width:min(720px,100%);background:var(--paper);border-left:1px solid var(--ink);transform:translateX(102%);transition:transform .6s var(--ease);display:flex;flex-direction:column}
+.drawer.open .panel{transform:none}
+.p-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.p-no{font-size:.8rem;letter-spacing:.14em;color:var(--ink-2)}
+.p-close{width:42px;height:42px;border:1px solid var(--ink);border-radius:999px;display:grid;place-items:center;transition:.25s}
+.p-close:hover{background:var(--accent);border-color:var(--accent);color:var(--paper);transform:rotate(90deg)}
+.p-close svg{width:15px;height:15px}
+.p-scroll{overflow-y:auto;padding:30px 30px 46px;flex:1}
+.p-prov{font-size:.8rem;letter-spacing:.16em;color:var(--accent);font-weight:700;margin-bottom:10px}
+.p-name{font-family:var(--fd);font-weight:400;font-size:clamp(2rem,5vw,3rem);line-height:1.15}
+.p-tags{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 22px}
+.p-tags span{border:1px solid var(--ink);border-radius:999px;padding:5px 13px;font-size:.78rem}
+.p-fig{border:1px solid var(--ink);aspect-ratio:16/9;overflow:hidden;margin-bottom:8px;background:var(--paper-2)}
+.p-fig img{width:100%;height:100%;object-fit:cover;opacity:0;transition:transform 6s ease,opacity .7s ease}
+.p-fig:hover img{transform:scale(1.05)}
+.p-cap{font-size:.78rem;color:var(--ink-2);margin-bottom:26px}
+.p-facts{border-top:1px solid var(--line);margin-bottom:28px}
+.fact{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid rgba(28,23,18,.18);font-size:.92rem}
+.fact dt{color:var(--ink-2);font-size:.82rem;letter-spacing:.06em;padding-top:2px}
+.fact dd{line-height:1.65}
+.p-body p{font-size:1rem;line-height:1.95;margin-bottom:16px}
+.p-high{margin-top:30px}
+.p-high h4{font-family:var(--fd);font-weight:400;font-size:1.2rem;margin-bottom:14px}
+.p-high ul{list-style:none}
+.p-high li{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(28,23,18,.14);font-size:.94rem;line-height:1.7}
+.p-high li::before{content:"";width:14px;height:3px;background:var(--accent);flex:0 0 auto;transform:translateY(-3px)}
+.p-foot{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap}
+.p-foot .cta{padding:14px 22px;font-size:.9rem}
+.p-foot .cta.saved{background:var(--paper);color:var(--ink);border:1px solid var(--ink)}
+
+/* ภาพที่โหลดเสร็จค่อย ๆ ปรากฏ */
+img.loaded{opacity:1!important}
+
+/* ---------- ทอสต์ ---------- */
+#toastWrap{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:950;display:flex;flex-direction:column;gap:10px;align-items:center}
+.toast{display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);padding:13px 22px;border-radius:999px;font-size:.9rem;opacity:0;transform:translateY(14px);transition:.4s var(--ease);white-space:nowrap}
+.toast.show{opacity:1;transform:none}
+.toast svg{width:15px;height:15px;color:var(--accent)}
+
+/* ---------- เมนูมือถือ ---------- */
+.mmenu{position:fixed;inset:0;z-index:850;background:var(--paper);display:flex;flex-direction:column;justify-content:center;padding:0 8vw;transform:translateY(-102%);transition:transform .6s var(--ease)}
+.mmenu.open{transform:none}
+.mmenu a{font-family:var(--fd);font-size:clamp(2.2rem,10vw,3.4rem);padding:14px 0;border-bottom:1px solid var(--line)}
+.mmenu .m-foot{margin-top:34px;font-size:.85rem;color:var(--ink-2)}
+
+/* ---------- เอฟเฟกต์เลื่อน ---------- */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) var(--d,0s),transform .9s var(--ease) var(--d,0s)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- จอเล็ก ---------- */
+@media (max-width:1024px){
+  .badge{display:none}
+  .sec-note{display:none}
+  .sec-head{grid-template-columns:auto 1fr}
+}
+@media (max-width:860px){
+  #nav .links{display:none}
+  .clock{display:none}
+  .burger{display:flex}
+  .hero{padding-top:92px}
+  .hero-img-main{position:static;width:100%;aspect-ratio:16/9;margin-top:26px;order:3}
+  .hero{flex-wrap:wrap}
+  .hero-title .line.l2{text-align:left;padding-right:0}
+  .hero-foot{grid-template-columns:1fr;gap:24px}
+  .drow{grid-template-columns:2.4rem 1fr auto;grid-template-rows:auto auto;row-gap:12px}
+  .d-meta{grid-column:2/4;flex-wrap:wrap;gap:12px}
+  .d-act{grid-row:1}
+  .route-grid{grid-template-columns:1fr}
+  .route-side{position:static}
+  .f-top{grid-template-columns:1fr}
+  .p-scroll{padding:24px 20px 40px}
+}
+@media (max-width:560px){
+  .stats{gap:22px}
+  .stat b{font-size:1.7rem}
+  .save-btn span{display:none}
+  .d-cat,.d-sub{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ตัวโหลด -->
+<div id="loader">
+  <div class="l-mark">ไปไหนดี</div>
+  <div class="l-bar"><i id="lbar"></i></div>
+  <div class="l-num" id="lnum">00</div>
+</div>
+
+<!-- แถบเมนู -->
+<header id="nav">
+  <a class="brand" href="#top">ไปไหนดี<span>®</span></a>
+  <nav class="links">
+    <a href="#destinations">ปลายทาง</a>
+    <a href="#route">เส้นทาง 72 ชม.</a>
+    <a href="#fieldnote">จดหมายจากทาง</a>
+  </nav>
+  <div class="nav-right">
+    <span class="clock" id="clock">--:--:--</span>
+    <button class="save-btn" id="saveBtn"><span>บันทึกไว้</span><b id="saveCount">0</b></button>
+    <button class="burger" id="burger" aria-label="เปิดเมนู">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- รายการที่บันทึกไว้ -->
+<div class="save-pop" id="savePop">
+  <div class="sp-head">รายการที่บันทึกไว้</div>
+  <div id="saveList"></div>
+</div>
+
+<main>
+  <!-- ฮีโร่ -->
+  <section class="hero" id="top">
+    <div class="hero-top">
+      <span>คู่มือปลายทาง · ฉบับที่ 01</span>
+      <span>ประเทศไทย — รวบรวมและเขียนเอง</span>
+    </div>
+    <h1 class="hero-title">
+      <span class="line l1"><span class="inner">ไปไหน<em class="h-img"><img id="heroChipImg" alt="น้ำตกเอราวัณ จังหวัดกาญจนบุรี"></em></span></span>
+      <span class="line l2"><span class="inner" style="transition-delay:.12s">ดี<span class="q">?</span></span></span>
+    </h1>
+    <img class="hero-img-main" id="heroMainImg" alt="ทะเลหมอกยามเช้าที่ภูชี้ฟ้า จังหวัดเชียงราย">
+    <div class="badge" id="badge">
+      <svg class="badge-ring" viewBox="0 0 200 200">
+        <defs><path id="cp" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+        <text><textPath href="#cp" textLength="486">ประเทศไทย · แปดปลายทางคัดสรร · ฤดูหนาว 2568 ·</textPath></text>
+      </svg>
+      <svg class="badge-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16m0 0 6-6m-6 6-6-6"/></svg>
+    </div>
+    <div class="hero-foot">
+      <p class="lede">คัดสรร 8 ปลายทางทั่วไทย — จากน้ำตกเจ็ดชั้นที่กาญจนบุรีถึงทะเลหมอกที่ภูชี้ฟ้า — พร้อมฤดูกาลที่ใช่ งบโดยประมาณ และวิธีเดินทางจริงทุกที่ ภาพทั้งหมดเป็นภาพจริงของสถานที่</p>
+      <a class="cta" href="#destinations">ดูปลายทางทั้งหมด
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </a>
+      <div class="stats">
+        <div class="stat"><b data-n="8">0</b><span>ปลายทาง</span></div>
+        <div class="stat"><b data-n="7">0</b><span>จังหวัด</span></div>
+        <div class="stat"><b data-n="72">0</b><span>ชม. เส้นทาง</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- แถบวิ่ง -->
+  <div class="ticker" aria-hidden="true"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <!-- ปลายทาง -->
+  <section id="destinations" class="section">
+    <div class="sec-head reveal">
+      <div class="sec-no">01</div>
+      <div>
+        <p class="sec-kick">ปลายทาง</p>
+        <h2>ปลายทางที่คัดแล้ว</h2>
+      </div>
+      <p class="sec-note">ชี้ที่รายชื่อเพื่อพรีวิวภาพจริง และแตะเพื่อเปิดรายละเอียดทั้งหมด</p>
+    </div>
+    <div class="filters reveal" id="filters"></div>
+    <div class="dlist" id="dlist"></div>
+    <div class="peek" id="peek">
+      <div class="peek-in">
+        <div class="ph"><img id="peekImg" alt=""><span class="peek-tag" id="peekTag"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- เส้นทาง 72 ชม. -->
+  <section id="route" class="section" style="padding-top:0">
+    <div class="sec-head reveal">
+      <div class="sec-no">02</div>
+      <div>
+        <p class="sec-kick">เส้นทางตัวอย่าง</p>
+        <h2>หนีเมือง 72 ชั่วโมง</h2>
+      </div>
+      <p class="sec-note">สามวันสองคืนรอบแม่น้ำแคว เดินทางด้วยรถไฟได้ตลอดเส้นทาง</p>
+    </div>
+    <div class="route-grid">
+      <div class="route-side reveal">
+        <h3 style="font-family:var(--fd);font-weight:400;font-size:1.5rem">กาญจนบุรี แบบไม่รีบ</h3>
+        <p>ทริปที่ออกแบบให้ใช้รถไฟสายธนบุรีเป็นแกนหลัก — สายที่วิ่งเรื่อย ๆ ริมตลาดแม่กลอง ผ่านทุ่งนา และจบที่น้ำตกเสาวรภาพ ยิ่งไม่รีบ ยิ่งได้มาก</p>
+        <button class="btn-ghost" id="copyPlan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="1"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></svg>
+          คัดลอกแผนทั้งหมด
+        </button>
+      </div>
+      <div id="routeDays"></div>
+    </div>
+  </section>
+
+  <!-- จดหมายจากทาง -->
+  <section id="fieldnote" class="quote-sec">
+    <span class="k reveal">จดหมายจากทาง — จากขบวนรถไฟสายธนบุรี</span>
+    <blockquote class="reveal" style="--d:.1s">ทางรถไฟสายนี้ไม่เคยตรงเวลา แต่ก็ไม่เคยปฏิเสธใคร — แล้วทุกคนบนขบวนก็ยังยิ้ม <em>เพราะรู้ว่าข้างหน้าคือแม่กลอง</em></blockquote>
+    <span class="c reveal" style="--d:.2s">— บันทึกลงสมุดเล่มเล็ก ริมหน้าต่างขบวนเช้า ฤดูหนาว</span>
+  </section>
+</main>
+
+<!-- ท้ายหน้า -->
+<footer>
+  <div class="f-top">
+    <div>
+      <a class="brand" href="#top">ไปไหนดี<span>®</span></a>
+      <p>คู่มือปลายทางเที่ยวไทยที่คัดด้วยมือ — เลือกเฉพาะที่ที่อยากกลับไปซ้ำ ไม่เอาที่แค่คนเยอะ</p>
+    </div>
+    <div class="f-col">
+      <h5>หน้า</h5>
+      <a href="#destinations">ปลายทาง</a>
+      <a href="#route">เส้นทาง 72 ชม.</a>
+      <a href="#fieldnote">จดหมายจากทาง</a>
+    </div>
+    <div class="f-col">
+      <h5>ปลายทางยอดนิยม</h5>
+      <button data-open="erawan">น้ำตกเอราวัณ</button>
+      <button data-open="mayabay">อ่าวมาหยา</button>
+      <button data-open="phuchifa">ภูชี้ฟ้า</button>
+      <button data-open="ayutthaya">อุทยานอยุธยา</button>
+    </div>
+  </div>
+  <div class="f-big reveal">ไปไหนดี</div>
+  <div class="f-bot">
+    <span>© 2568 ไปไหนดี — จัดทำด้วยความอยากออกจากเมือง</span>
+    <span>ภาพสถานที่จริงจาก Wikimedia Commons</span>
+    <span>เวลาท้องถิ่น <span id="clock2">--:--</span> (กรุงเทพฯ)</span>
+  </div>
+</footer>
+
+<!-- แผงรายละเอียด -->
+<div class="drawer" id="drawer" aria-hidden="true">
+  <div class="scrim" data-close></div>
+  <aside class="panel" role="dialog" aria-modal="true">
+    <header class="p-head">
+      <span class="p-no" id="pNo"></span>
+      <button class="p-close" id="pClose" aria-label="ปิด">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="p-scroll">
+      <p class="p-prov" id="pProv"></p>
+      <h2 class="p-name" id="pName"></h2>
+      <div class="p-tags" id="pTags"></div>
+      <figure class="p-fig"><img id="pImg" alt=""></figure>
+      <p class="p-cap" id="pCap"></p>
+      <dl class="p-facts" id="pFacts"></dl>
+      <div class="p-body" id="pBody"></div>
+      <div class="p-high"><h4>ห้ามพลาด</h4><ul id="pHigh"></ul></div>
+      <div class="p-foot">
+        <button class="cta" id="pSave">บันทึกใส่รายการ</button>
+        <button class="btn-ghost" id="pShare">คัดลอกพิกัด</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="mmenu" id="mmenu">
+  <a href="#destinations">ปลายทาง</a>
+  <a href="#route">เส้นทาง 72 ชม.</a>
+  <a href="#fieldnote">จดหมายจากทาง</a>
+  <p class="m-foot">เวลาท้องถิ่น <span id="clockM">--:--</span> (กรุงเทพฯ)</p>
+</div>
+
+<div id="toastWrap"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const pic = (seed,w,h)=>`https://picsum.photos/seed/${seed}/${w}/${h}.jpg`;
+
+/* ---------- ข้อมูลปลายทาง ---------- */
+const PLACES = [
+  {id:'erawan', name:'น้ำตกเอราวัณ', prov:'กาญจนบุรี', cats:['ธรรมชาติ','ภูเขา'], seed:'erawan-falls',
+   season:'พ.ย. — ก.พ.', budget:'~450 บาท / คน / วัน', coords:'14.3741° N · 99.1375° E',
+   travel:'รถไฟสายธนบุรีถึงสถานีน้ำตกเสาวรภาพ หรือรถสองแถวจากตัวเมืองกาญจนฯ ประมาณ 45 นาที',
+   body:['น้ำตกเจ็ดชั้นในอุทยานแห่งชาติเอราวัณ ไหลผ่านหินแคลไซต์จนเกิดสีเขียวมรกตที่หาไม่ได้จากน้ำตกไหนในไทย เดินจากลานกางเต็นท์ขึ้นไปเรื่อย ๆ ตามป้ายศึกษาธรรมชาติ จนถึงชั้นสามที่ชื่อ “ภูมิริน” — ชั้นที่คนส่วนใหญ่ขี้เกียจขึ้น และนั่นแหละคือเหตุผลที่คุณควรขึ้น',
+   'เคล็ดลับคือมาถึงก่อนเก้าโมงเช้า ก่อนรถบัสทัวร์ถึงกอง เก็บตั๋วคนไทย 100 บาท ตักน้ำแช่เท้าที่ชั้นหนึ่ง แล้วปล่อยให้ปลาเสียตัวตัวโตจัดการบริการนวดให้ฟรี ๆ'],
+   high:['ชั้นสาม “ภูมิริน” ยามแดดส่องทะลุใบไม้','ปลาเสียตัวจิกเท้าที่ชั้นหนึ่ง','เส้นทางศึกษาธรรมชาติ 1.7 กม. ริมลำธาร']},
+  {id:'mayabay', name:'อ่าวมาหยา', prov:'กระบี่ · เกาะพีพี', cats:['ทะเล'], seed:'maya-bay',
+   season:'พ.ย. — เม.ย.', budget:'~1,600 บาท / คน / วัน', coords:'7.7782° N · 98.7670° E',
+   travel:'เรือเร็วจากท่าเรือกระบี่หรืออ่าวนาง ประมาณ 45 นาที มีคิวเรือเข้าอ่าวแบบจำกัดจำนวน',
+   body:['แอ่งอ่าวเล็ก ๆ ที่หน้าผาหินปูนยักษ์โอบรอบจนเกือบปิดสนิท ทรายขาวละเอียดและน้ำใสระดับที่เมื่อยี่สิบกว่าปีก่อนหนังเรื่องหนึ่งพามาโด่งดังทั่วโลก ก่อนถูกปิดฟื้นฟูยาวนานเพื่อให้ธรรมชาติได้หายใจอีกครั้ง',
+   'ปัจจุบันเปิดแบบจำกัดเวลาและจำกัดคน — เรือลำแรกถึงเจ็ดโมง ถ้าอยากได้อ่าวที่ยังเงียบและน้ำยังนิ่ง ให้ตื่นก่อนเรือลำแรก แล้วค้างคืนที่พีพีดอนไว้'],
+   high:['จุดชมวิวเหนืออ่าว เดินป่าขึ้นราว 30 นาที','ดำน้ำตื้นแนวปะการังที่กำลังฟื้นตัว','พีพีดอนยามค่ำหลังเรือทัวร์กลับหมด']},
+  {id:'cmold', name:'เมืองเก่าเชียงใหม่', prov:'เชียงใหม่', cats:['เมืองเก่า','วัดและศิลปะ'], seed:'chiangmai-old',
+   season:'พ.ย. — ก.พ.', budget:'~800 บาท / คน / วัน', coords:'18.7883° N · 98.9853° E',
+   travel:'เครื่องบินจากกรุงเทพฯ 1 ชม. แล้วเช่าจักรยานหรือเดินเท้าภายในกำแพงเมืองได้ทั้งวัน',
+   body:['สี่เหลี่ยมกำแพงอิฐเก่าอายุกว่าเจ็ดร้อยปี ข้างในบรรจุวัดเก่าแก่กว่าสามสิบแห่ง ตรอกแคบ ๆ และคาเฟ่ที่เปิดในบ้านไม้หลังเก่าที่ถูกดัดใหม่อย่างประณีต',
+   'เช่าจักรยานคันละหลักสิบบาท วนตามร่มไม้กลางวัน เข้าวัดเจดีย์หลวงกับวัดพระเชษฐ์ ออกมาแวะตลาดวโรรสช่วงเช้า แล้วจบวันด้วยการเดินเท้าเปล่า ๆ ริมกำแพงเมืองตอนอากาศเริ่มหอมความหนาว'],
+   high:['วัดเจดีย์หลวงตอนแดดบ่ายเอียง','ตลาดวโรรสยามเช้ากับกาแฟโบราณ','เดินริมกำแพงเมืองยามค่ำฤดูหนาว']},
+  {id:'phuchifa', name:'ภูชี้ฟ้า', prov:'เชียงราย', cats:['ภูเขา','ธรรมชาติ'], seed:'phu-chi-fah',
+   season:'ธ.ค. — ก.พ.', budget:'~600 บาท / คน / วัน', coords:'19.9972° N · 99.8586° E',
+   travel:'รถจากตัวเมืองเชียงรายถึงบ้านร่องจั่นประมาณ 2 ชม. แล้วขึ้นบันไดจากจุดจอดรถ',
+   body:['ยอดเขาหินทรายเรียวรีบนแนวพรมแดนไทย—เมียนมา ตามตำนานเล่าว่าเคยมีผีชี้ทางให้คนหลงป่ากลับบ้าน ทุกวันนี้สิ่งที่ถูกชี้ให้เห็นคือทะเลหมอกและดวงอาทิตย์ที่โผล่มาพร้อมกันตอนหกโมงเช้า',
+   'ต้องแลกด้วยแรงขาจริง ๆ — บันไดเหล็กหลายร้อยขั้นบนอากาศที่เย็นจนมือชา แต่พอแดดแรกกระทบทะเลหมอกเป็นระลอก ทุกขั้นที่ปีนขึ้นกลายเป็นดอกเบี้ยที่คุ้มค่าที่สุดในปี'],
+   high:['ทะเลหมอกรับพระแรกเงาตอนหกโมง','ดอกพยาเต้สีม่วงอมชมพูบานปลาย พ.ย.','กาแฟชุมชนม้งที่บ้านร่องจั่นระหว่างทาง']},
+  {id:'amphawa', name:'ตลาดน้ำอัมพวา', prov:'สมุทรสงคราม', cats:['เมืองเก่า'], seed:'amphawa-river',
+   season:'ก.ค. — ต.ค.', budget:'~500 บาท / คน / วัน', coords:'13.4695° N · 100.0137° E',
+   travel:'รถตู้จากปิ่นเกล้าประมาณ 1.5 ชม. ลงสามแยกอัมพวา ข้ามคลองด้วยเรือสัญจร',
+   body:['ตลาดน้ำที่ยังเป็นชีวิตของคนมากกว่าเป็นโชว์ — เรือเล็ก ๆ ขายขนมจากร้อน ๆ ที่เทลงราง กาแฟโบราณ และอาหารทะเลริมคลอง ที่อยู่กันมาตั้งแต่ก่อนคำว่า “เช็กอิน” จะมีอยู่',
+   'ความจริงที่คนส่วนใหญ่พลาด: ตลาดเปิดตีสี่ครึ่ง คนซื้อจริง ๆ คือชาวบ้านที่มาซื้อของสด ของเริ่มหมดราวหกโมง ส่วนค่ำคืนนั้นเป็นของอีกโปรแกรม — ลงเรือหางยาวไล่ดูหิ่งห้อยนับหมื่นพัน ๆ ที่ต้นลำพูริมคลอง'],
+   high:['ตลาดเช้าตีห้ากับขนมจากสด ๆ','เรือหางยาวชมหิ่งห้อยช่วงน้ำหลาก','นอนโฮมสเตย์แพริมคลอง เปิดหน้าต่างรับลม']},
+  {id:'rongkhun', name:'วัดร่องขุ่น', prov:'เชียงราย', cats:['วัดและศิลปะ'], seed:'white-temple',
+   season:'ทั้งปี (เช้าหมอกบางสวยที่สุด)', budget:'~300 บาท / คน / วัน', coords:'19.8242° N · 99.7645° E',
+   travel:'รถจากตัวเมืองเชียงรายประมาณ 25 นาที หรือสายเหนือฝั่งตรงข้ามตลาดกลางเกษตร',
+   body:['วัดที่ขาวจนแทบรับแสงไม่ไหว ฝีมืออาจารย์เฉลิมชัย โฆษิตปิญาณ ศิลปินระดับชาติชาวเชียงราย ทุกองค์ประกอบมีความหมาย — สระเงินคือมหาสมุทร สะพานคือทางข้ามจากโลกมนุษย์ และใต้สะพานคือรูปมือนับพันที่ยื่นขึ้นมาจากหลุม',
+   'ยิ่งกลางวันแดดจัดยิ่งขาวเจิด แต่ถ้าได้เวลาเช้าที่อากาศมีหมอกบาง ๆ ตัววัดจะดูเหมือนกำลังลอยอยู่เหนือสระเงิน อย่าลืมรอถึงค่ำ — หอนาฬิกากลางเมืองที่อาจารย์คนเดียวกันออกแบบ จะเปิดไฟแสงสีทุกครึ่งชั่วโมง'],
+   high:['สะพานสู่สวรรค์ — เดินไปได้ทางเดียว','สระเงินรอบอุโบสถยามเช้ามีหมอก','หอนาฬิกาเชียงรายตอนไฟเปิดตอนค่ำ']},
+  {id:'samet', name:'เกาะเสม็ด', prov:'ระยอง', cats:['ทะเล'], seed:'koh-samet',
+   season:'ต.ค. — พ.ค.', budget:'~900 บาท / คน / วัน', coords:'12.3539° N · 101.7667° E',
+   travel:'รถยนต์จากกรุงเทพฯ 3.5 ชม. ถึงท่าเรือบ้านเพ แล้วเรือข้ามอีก 45 นาที',
+   body:['เกาะที่ใกล้กรุงเทพฯ ที่สุดเท่าที่ทะเลจะยังใสได้ — ขับรถสามชั่วโมงครึ่ง ข้ามเรือสี่สิบห้านาที ก็ถึงหาดไก่แห้งที่น้ำใสจนเห็นเงาเรือตัวเองบนพื้นทราย',
+   'เกือบครึ่งของเกาะยังเป็นเขตอุทยานแห่งชาติ ถนนลูกรังแคบ ๆ พาไปหาดที่ยังเงียบอย่างทรงยาวและอ่าวพระ เช่ามอเตอร์ไซค์วันละไม่กี่ร้อย แล้วอย่าลืมตั้งปลุกหนึ่งครั้งเพื่อพระอาทิตย์ขึ้นที่หาดแก้ว'],
+   high:['พระอาทิตย์ขึ้นที่หาดแก้วยามเช้ามืด','มอเตอร์ไซค์ลัดเลาะถนนลูกรังรอบเกาะ','ปลายหาดไก่แห้งยามเย็นที่คนเริ่มทยอยกลับ']},
+  {id:'ayutthaya', name:'อุทยานประวัติศาสตร์อยุธยา', prov:'พระนครศรีอยุธยา', cats:['เมืองเก่า','วัดและศิลปะ'], seed:'ayutthaya-park',
+   season:'พ.ย. — ก.พ.', budget:'~400 บาท / คน / วัน', coords:'14.3532° N · 100.5776° E',
+   travel:'รถไฟจากกรุงเทพฯ (สถานีกรุงเทพ) ประมาณ 1.5 ชม. หรือรถตู้จากอนุสาวรีย์ชัยฯ',
+   body:['อดีตราชธานีสี่ร้อยสิบเจ็ดปี วันนี้ซากเจดีย์และพระอุโบสถกระจายอยู่บนเกาะเมืองที่แม่น้ำสามสายโอบอยู่ — เจ้าพระยา ป่าสัก และลพบุรี เป็นมรดกโลกที่เช่าจักรยานร้อยบาทแล้วกินได้ทั้งวัน',
+   'เรียงวันแบบคนท้องถิ่น: วัดไชยวัฒนารามตอนเช้าที่แสงยังนุ่ม วัดมหาธาตุตอนสายเพื่อยืนดูรากโพธิ์ยักษ์ที่โอบหัวพระพุทธรูป แล้วปิดท้ายด้วยลูกชุบร้านเก่าริมถนนอู่ทองก่อนขึ้นรถไฟกลับ'],
+   high:['วัดไชยวัฒนารามยามเช้า แสงนุ่ม คนน้อย','รากโพธิ์กลบหัวพระพุทธรูปที่วัดมหาธาตุ','ลูกชุบไข่รมดกร้านเก่าริมถนนอู่ทอง']},
+];
+
+/* ---------- ข้อมูลเส้นทาง ---------- */
+const ROUTE = [
+  {day:'วันที่ 01', title:'ล่องสู่แม่กลอง', stops:[
+    {t:'เช้า', h:'ขบวนรถไฟสายธนบุรี', d:'ออกจากสถานีบางกอกน้อย ไปลงสถานีปลายทางน้ำตกเสาวรภาพ ช่วงบ่ายขบวนจะวิ่งซอกผ่านตลาดแม่กลองชิดร้านค้า'},
+    {t:'บ่าย', h:'สะพานข้ามแม่กลอง', d:'เดินสะพานไม้โครงสร้างเดิม กินข้าวแกงริมทางรถไฟ แล้วนั่งรอขบวนผ่านให้ครบสักครั้ง'},
+    {t:'ค่ำ', h:'แพริมแม่น้ำแคว', d:'ย้ายที่พักไปแพริมแม่น้ำแคว ฟังเสียงรถไฟไกล ๆ จากสะพานข้ามแม่น้ำแคว'}]},
+  {day:'วันที่ 02', title:'เอราวัณทั้งวัน', stops:[
+    {t:'07:30', h:'ขึ้นน้ำตกก่อนใคร', d:'เดินจากลานกางเต็นท์ขึ้นชั้นหนึ่งถึงสาม น้ำสีเขียวมรกต แวะให้ปลาเสียตัวจิกเท้าที่ชั้นหนึ่ง'},
+    {t:'กลางวัน', h:'ปิกนิกริมชั้นสอง', d:'ซื้อข้าวกล่องจากร้านหน้าอุทยาน นั่งกินกับเสียงน้ำตกแทนร้านอาหาร'},
+    {t:'บ่าย', h:'เส้นทางศึกษาธรรมชาติ', d:'ทางย่อริมลำธาร 1.7 กม. ผ่านป่าดิบแล้งและเฟิร์นทั้งหุบ กลับพักก่อนมืด'}]},
+  {day:'วันที่ 03', title:'ขึ้นสูงสุดก่อนกลับ', stops:[
+    {t:'08:30', h:'วัดถ้ำเสือ', d:'ขึ้นบันไดกว่า 600 ขั้นสู่จุดชมวิว 360 องศา เห็นตัวเมืองกาญจนบุรีและแม่น้ำแควโค้งทั้งเส้น'},
+    {t:'11:00', h:'กาแฟริมแคว', d:'กลับลงมาตัวเมือง จบทริปด้วยกาแฟริมน้ำก่อนเก็บของ'},
+    {t:'บ่าย', h:'ขบวนบ่ายกลับบางกอกน้อย', d:'ขากลับให้เลือกขบวนบ่าย — รถไฟเข้าเมืองตอนแสงส้ม คือการปิดทริปที่ถูกต้องที่สุด'}]},
+];
+
+/* ================================================================
+   ระบบภาพจริงของสถานที่ — ดึงภาพประกอบจากบทความ Wikipedia
+   (Wikimedia Commons) ของสถานที่นั้นโดยตรง พร้อมผู้สมัครสำรอง
+   หลายตัว: วิกิไทย → วิกิอังกฤษ → ภาพ placeholder ปิดท้าย
+   ================================================================ */
+const WIKI = {
+  erawan:    ['th:น้ำตกเอราวัณ','en:Erawan_National_Park','en:Erawan_Waterfall'],
+  mayabay:   ['en:Maya_Bay','th:อ่าวมาหยา'],
+  cmold:     ['en:Wat_Chedi_Luang','th:วัดเจดีย์หลวง','en:Chiang_Mai'],
+  phuchifa:  ['th:ภูชี้ฟ้า','en:Phu_Chi_Fa'],
+  amphawa:   ['th:ตลาดน้ำอัมพวา','en:Amphawa_Floating_Market','en:Amphawa_District'],
+  rongkhun:  ['en:Wat_Rong_Khun','th:วัดร่องขุ่น'],
+  samet:     ['en:Ko_Samet','th:เกาะเสม็ด'],
+  ayutthaya: ['en:Ayutthaya_Historical_Park','th:อุทยานประวัติศาสตร์อยุธยา','en:Wat_Chaiwatthanaram'],
+};
+
+async function fetchWikiImage(cand){
+  const i = cand.indexOf(':');
+  const lang = cand.slice(0,i), title = cand.slice(i+1);
+  const url = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('miss');
+  const j = await r.json();
+  if(!j.thumbnail || !j.thumbnail.source) throw new Error('noimg');
+  return {
+    thumb: j.thumbnail.source,
+    orig: j.originalimage ? j.originalimage.source : null,
+    w: j.originalimage ? j.originalimage.width : 0
+  };
+}
+
+async function loadPlaceImages(){
+  const jobs = PLACES.map(async p=>{
+    for(const cand of (WIKI[p.id]||[])){
+      try{
+        const r = await fetchWikiImage(cand);
+        p.imgRaw = r.thumb; p.imgOrig = r.orig; p.imgW = r.w;
+        return;
+      }catch(e){ /* ลองแหล่งข้อมูลถัดไป */ }
+    }
+  });
+  await Promise.allSettled(jobs);
+  if(currentId) syncDrawerImage(); // ถ้าแผงเปิดอยู่ ให้อัปเดตเป็นภาพจริงทันที
+}
+
+/* ขยายขนาด thumbnail ของ Wikimedia ตามที่ต้องการ */
+function candidates(p, w){
+  const list = [];
+  if(p.imgRaw){
+    const tw = p.imgW ? Math.min(w, p.imgW) : w;
+    list.push(p.imgRaw.replace(/\/\d+px-/, `/${tw}px-`));
+    if(p.imgOrig && p.imgW && p.imgW <= 2600) list.push(p.imgOrig);
+  }
+  list.push(pic(p.seed, Math.min(1600,w), Math.round(Math.min(1600,w)*0.72)));
+  return list;
+}
+
+/* ใส่รูปแบบมีลำดับสำรอง + จางเข้าเมื่อโหลดเสร็จ */
+function setImg(el, srcs, alt){
+  if(!el) return;
+  let i = 0;
+  el.classList.remove('loaded');
+  el.onerror = ()=>{ if(i < srcs.length) el.src = srcs[i++]; };
+  el.onload  = ()=> el.classList.add('loaded');
+  el.alt = alt || '';
+  el.src = srcs[i++];
+}
+
+function applyHeroImages(){
+  const erawan = PLACES.find(p=>p.id==='erawan');
+  const phu = PLACES.find(p=>p.id==='phuchifa');
+  if(erawan) setImg($('#heroChipImg'), candidates(erawan, 480), 'น้ำตกเอราวัณ จังหวัดกาญจนบุรี');
+  if(phu) setImg($('#heroMainImg'), candidates(phu, 900), 'ทะเลหมอกยามเช้าที่ภูชี้ฟ้า จังหวัดเชียงราย');
+}
+
+const imagesReady = loadPlaceImages();
+
+/* ---------- แถบวิ่ง ---------- */
+(() => {
+  const stars = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M4.5 7.5l15 9M19.5 7.5l-15 9"/></svg>';
+  const provs = ['กาญจนบุรี','สมุทรสงคราม','พระนครศรีอยุธยา','เชียงใหม่','เชียงราย','กระบี่','ระยอง'];
+  const g = '<div class="ticker-g">' + provs.map(p=>`<span>${p}</span>${stars}`).join('') + '</div>';
+  $('#tickerTrack').innerHTML = g + g;
+})();
+
+/* ---------- ตัวโหลด (รอภาพจริงก่อนเปิดม่าน แต่ไม่เกิน 1.8 วินาที) ---------- */
+(() => {
+  let p = 0;
+  const iv = setInterval(()=>{
+    p = Math.min(100, p + Math.random()*17 + 7);
+    $('#lnum').textContent = String(Math.floor(p)).padStart(2,'0');
+    $('#lbar').style.width = p + '%';
+    if(p >= 100){
+      clearInterval(iv);
+      Promise.race([imagesReady, new Promise(res=>setTimeout(res,1800))]).then(()=>{
+        setTimeout(()=>{
+          $('#loader').classList.add('done');
+          document.body.classList.add('ready');
+          applyHeroImages();
+        }, 260);
+      });
+    }
+  }, 110);
+})();
+
+/* ---------- นาฬิกา ---------- */
+(() => {
+  const f = new Intl.DateTimeFormat('th-TH',{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const f2 = new Intl.DateTimeFormat('th-TH',{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit',hour12:false});
+  const tick = () => {
+    const now = new Date();
+    $('#clock').textContent = f.format(now) + ' น.';
+    $('#clock2').textContent = f2.format(now);
+    $('#clockM').textContent = f2.format(now) + ' น.';
+  };
+  tick(); setInterval(tick, 1000);
+})();
+
+/* ---------- เมนูมือถือ + nav เลื่อน ---------- */
+const mmenu = $('#mmenu');
+ $('#burger').addEventListener('click', ()=> mmenu.classList.toggle('open'));
+mmenu.querySelectorAll('a').forEach(a => a.addEventListener('click', ()=> mmenu.classList.remove('open')));
+window.addEventListener('scroll', ()=> $('#nav').classList.toggle('scrolled', window.scrollY > 12));
+
+/* ---------- ตัวกรอง + ดัชนีปลายทาง ---------- */
+const FILTERS = ['ทั้งหมด','ทะเล','ภูเขา','เมืองเก่า','ธรรมชาติ','วัดและศิลปะ'];
+let currentCat = 'ทั้งหมด';
+const savedSet = new Set();
+
+function renderFilters(){
+  $('#filters').innerHTML = FILTERS.map(f=>{
+    const n = f==='ทั้งหมด' ? PLACES.length : PLACES.filter(p=>p.cats.includes(f)).length;
+    return `<button class="fbtn ${f===currentCat?'active':''}" data-cat="${f}">${f}<i>${String(n).padStart(2,'0')}</i></button>`;
+  }).join('');
+}
+ $('#filters').addEventListener('click', e=>{
+  const b = e.target.closest('.fbtn'); if(!b) return;
+  currentCat = b.dataset.cat;
+  renderFilters(); renderList();
+});
+
+function renderList(){
+  const list = PLACES.filter(p => currentCat==='ทั้งหมด' || p.cats.includes(currentCat));
+  $('#dlist').innerHTML = list.map((p,i)=>`
+    <article class="drow" data-id="${p.id}" style="animation-delay:${i*0.06}s">
+      <span class="d-no">${String(PLACES.indexOf(p)+1).padStart(2,'0')}</span>
+      <div>
+        <h3 class="d-name">${p.name}</h3>
+        <span class="d-prov">${p.prov}</span>
+      </div>
+      <div class="d-meta">
+        <span class="d-cat">${p.cats[0]}</span>
+        <span class="d-sub">ไปช่วง ${p.season}</span>
+        <span class="d-sub">${p.budget}</span>
+      </div>
+      <div class="d-act">
+        <button class="bm ${savedSet.has(p.id)?'on':''}" aria-label="บันทึก">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 4h10v17l-5-4-5 4z"/></svg>
+        </button>
+        <button class="go" aria-label="เปิดรายละเอียด">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </button>
+      </div>
+    </article>`).join('');
+}
+renderFilters(); renderList();
+
+/* ---------- คลิกที่แถว / ปุ่มบันทึก (event delegation) ---------- */
+ $('#dlist').addEventListener('click', e=>{
+  const bm = e.target.closest('.bm');
+  const row = e.target.closest('.drow');
+  if(!row) return;
+  const id = row.dataset.id;
+  if(bm){ toggleSave(id); return; }
+  openDrawer(id);
+});
+
+/* ---------- ภาพลอยตามเมาส์ (เฉพาะเมาส์จริง) ---------- */
+if(matchMedia('(pointer:fine)').matches){
+  const peek = $('#peek'), img = $('#peekImg'), tag = $('#peekTag');
+  let tx=0, ty=0, px=innerWidth/2, py=innerHeight/2, active=false;
+  const dlist = $('#dlist');
+  dlist.addEventListener('mousemove', e=>{ tx=e.clientX; ty=e.clientY; });
+  dlist.addEventListener('mouseover', e=>{
+    const row = e.target.closest('.drow'); if(!row) return;
+    const p = PLACES.find(x=>x.id===row.dataset.id); if(!p) return;
+    setImg(img, candidates(p, 540), 'ภาพจริงของ ' + p.name);
+    tag.textContent = p.prov.split(' · ')[0];
+    if(!active){ px=tx; py=ty; active=true; }
+    peek.classList.add('show');
+  });
+  dlist.addEventListener('mouseleave', ()=>{ peek.classList.remove('show'); active=false; });
+  (function loop(){
+    px += (tx-px)*0.13; py += (ty-py)*0.13;
+    const rot = Math.max(-8, Math.min(8, (tx-px)*0.09));
+    peek.style.transform = `translate(${px-135}px, ${py-190}px) rotate(${rot}deg)`;
+    requestAnimationFrame(loop);
+  })();
+}
+
+/* ---------- ระบบบันทึก ---------- */
+const icons = {
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>'
+};
+function toggleSave(id){
+  const p = PLACES.find(x=>x.id===id);
+  if(savedSet.has(id)){ savedSet.delete(id); toast(`เอา “${p.name}” ออกจากรายการแล้ว`); }
+  else { savedSet.add(id); toast(`เพิ่ม “${p.name}” ในรายการบันทึกแล้ว`); }
+  updateSaveUI(); refreshRows();
+}
+function updateSaveUI(){
+  const c = savedSet.size;
+  $('#saveCount').textContent = c;
+  $('#saveBtn').classList.toggle('has', c>0);
+  $('#saveList').innerHTML = c===0
+    ? '<div class="sp-empty">ยังไม่มีรายการ — กดป้ายบันทึกที่แถวปลายทางเพื่อเก็บไว้วางแผนทีหลัง</div>'
+    : [...savedSet].map(id=>{
+        const p = PLACES.find(x=>x.id===id);
+        return `<div class="sp-item" data-id="${id}">
+          <div><div class="n">${p.name}</div><div class="p">${p.prov} · ${p.season}</div></div>
+          <button class="sp-x" data-del="${id}" aria-label="ลบ">${icons.x}</button>
+        </div>`;
+      }).join('');
+}
+function refreshRows(){
+  document.querySelectorAll('.drow').forEach(r=>{
+    r.querySelector('.bm').classList.toggle('on', savedSet.has(r.dataset.id));
+  });
+  if(currentId) syncDrawerSave();
+}
+const savePop = $('#savePop');
+ $('#saveBtn').addEventListener('click', e=>{ e.stopPropagation(); savePop.classList.toggle('open'); });
+document.addEventListener('click', e=>{
+  if(!savePop.contains(e.target) && e.target !== $('#saveBtn')) savePop.classList.remove('open');
+});
+ $('#saveList').addEventListener('click', e=>{
+  const del = e.target.closest('[data-del]');
+  if(del){ toggleSave(del.dataset.del); return; }
+  const item = e.target.closest('.sp-item');
+  if(item){ savePop.classList.remove('open'); openDrawer(item.dataset.id); }
+});
+updateSaveUI();
+
+/* ---------- แผงรายละเอียด ---------- */
+const drawer = $('#drawer');
+let currentId = null;
+
+function syncDrawerSave(){
+  const p = PLACES.find(x=>x.id===currentId); if(!p) return;
+  const on = savedSet.has(p.id);
+  const btn = $('#pSave');
+  btn.classList.toggle('saved', on);
+  btn.innerHTML = on ? icons.check + ' อยู่ในรายการแล้ว — กดเพื่อเอาออก' : 'บันทึกใส่รายการ';
+}
+function syncDrawerImage(){
+  const p = PLACES.find(x=>x.id===currentId); if(!p) return;
+  setImg($('#pImg'), candidates(p, 1280), 'ภาพจริงจาก Wikimedia Commons — ' + p.name);
+  $('#pCap').textContent = 'ภาพจริงของสถานที่จาก Wikimedia Commons — ' + p.name;
+}
+function openDrawer(id){
+  const p = PLACES.find(x=>x.id===id); if(!p) return;
+  currentId = id;
+  const no = PLACES.indexOf(p)+1;
+  $('#pNo').textContent = `ปลายทาง ${String(no).padStart(2,'0')} / ${String(PLACES.length).padStart(2,'0')}`;
+  $('#pProv').textContent = p.prov;
+  $('#pName').textContent = p.name;
+  $('#pTags').innerHTML = p.cats.map(c=>`<span>${c}</span>`).join('') + `<span>ไปช่วง ${p.season}</span>`;
+  syncDrawerImage();
+  const facts = [['ช่วงที่ใช่', p.season], ['งบโดยประมาณ', p.budget], ['การเดินทาง', p.travel], ['พิกัด', p.coords]];
+  $('#pFacts').innerHTML = facts.map(([k,v])=>`<div class="fact"><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  $('#pBody').innerHTML = p.body.map(t=>`<p>${t}</p>`).join('');
+  $('#pHigh').innerHTML = p.high.map(h=>`<li>${h}</li>`).join('');
+  syncDrawerSave();
+  drawer.classList.add('open');
+  drawer.setAttribute('aria-hidden','false');
+  document.body.classList.add('lock');
+  savePop.classList.remove('open');
+  setTimeout(()=> $('#pClose').focus(), 350);
+}
+function closeDrawer(){
+  drawer.classList.remove('open');
+  drawer.setAttribute('aria-hidden','true');
+  document.body.classList.remove('lock');
+  currentId = null;
+}
+ $('#pClose').addEventListener('click', closeDrawer);
+drawer.querySelector('.scrim').addEventListener('click', closeDrawer);
+ $('#pSave').addEventListener('click', ()=> currentId && toggleSave(currentId));
+ $('#pShare').addEventListener('click', ()=>{
+  const p = PLACES.find(x=>x.id===currentId); if(!p) return;
+  copyText(`${p.name} — ${p.prov} (${p.coords})`, 'คัดลอกพิกัดแล้ว');
+});
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Escape') return;
+  if(drawer.classList.contains('open')) closeDrawer();
+  savePop.classList.remove('open');
+  mmenu.classList.remove('open');
+});
+document.querySelectorAll('[data-open]').forEach(b=>{
+  b.addEventListener('click', ()=> openDrawer(b.dataset.open));
+});
+
+/* ---------- คัดลอกข้อความ + ทอสต์ ---------- */
+function copyText(text, msg){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast(msg)).catch(()=>fallbackCopy(text,msg));
+  } else fallbackCopy(text, msg);
+}
+function fallbackCopy(text, msg){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast(msg); }catch(e){ toast('คัดลอกไม่สำเร็จ'); }
+  ta.remove();
+}
+function toast(msg){
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = icons.check + `<span>${msg}</span>`;
+  $('#toastWrap').appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 2400);
+}
+
+/* ---------- เส้นทาง 72 ชม. ---------- */
+ $('#routeDays').innerHTML = ROUTE.map(d=>`
+  <div class="day reveal">
+    <div class="day-head"><span class="day-no">${d.day}</span><h3>${d.title}</h3></div>
+    <ol class="stops">
+      ${d.stops.map(s=>`<li><span class="t">${s.t}</span><span class="dot"></span><div><strong>${s.h}</strong><p>${s.d}</p></div></li>`).join('')}
+    </ol>
+  </div>`).join('');
+
+ $('#copyPlan').addEventListener('click', ()=>{
+  const text = 'แผนหนีเมือง 72 ชั่วโมง — กาญจนบุรี\n\n' + ROUTE.map(d=>{
+    return `${d.day}: ${d.title}\n` + d.stops.map(s=>`  ${s.t} — ${s.h}: ${s.d}`).join('\n');
+  }).join('\n\n');
+  copyText(text, 'คัดลอกแผนเส้นทางทั้งหมดแล้ว');
+});
+
+/* ---------- เอฟเฟกต์เลื่อน + ตัวเลขสถิติ ---------- */
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+const statIO = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(!e.isIntersecting) return;
+    statIO.unobserve(e.target);
+    e.target.querySelectorAll('b[data-n]').forEach(b=>{
+      const target = +b.dataset.n, t0 = performance.now(), dur = 1100;
+      (function step(t){
+        const k = Math.min(1,(t-t0)/dur), ease = 1-Math.pow(1-k,3);
+        b.textContent = Math.round(target*ease);
+        if(k<1) requestAnimationFrame(step);
+      })(t0);
+    });
+  });
+},{threshold:.4});
+statIO.observe($('.stats'));
+</script>
+</body>
+</html>
